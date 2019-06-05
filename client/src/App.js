@@ -33,6 +33,10 @@ class App extends Component {
       });
   }
 
+  componentDidMount() {
+    this.requestCourses();
+  }
+
   render() {
     return (
       <div className="App">
