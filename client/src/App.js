@@ -3,7 +3,8 @@ import axios from 'axios';
 import './styles/global.css';
 
 import Header from './components/Header';
-import Courses from './components/Courses';
+// import Courses from './components/Courses';
+import CourseDetail from './components/CourseDetail';
 
 class App extends Component {
 
@@ -26,7 +27,7 @@ class App extends Component {
         this.setState({
           courses: response.data,
           loading: false
-        });
+        }, () => {});
       })
       .catch(error => {
         console.log('Error fetching and parsing data', error);
@@ -38,15 +39,19 @@ class App extends Component {
   }
 
   render() {
+
+    const course = this.state.courses[0] && <CourseDetail course={this.state.courses[0]}/>;
+
     return (
       <div className="App">
-        <Header/>
-        <hr/>
-        <Courses courses={this.state.courses}/>
+        <Header />
+        <hr />
+        {/* <Courses courses={this.state.courses}/> */}
+        { course }
       </div>
     );
   }
-  
+
 }
 
 export default App;
