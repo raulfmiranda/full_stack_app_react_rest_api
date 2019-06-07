@@ -8,12 +8,12 @@ function checkCredentials(req, res, next) {
     if (credentials && credentials.name && credentials.pass) {
         User.authenticate(credentials.name, credentials.pass, function (error, user) {
             if (error || !user) {
+                console.log('Wrong email or password.');
                 var err = new Error('Wrong email or password.');
                 err.status = 401;
                 return next(err);
             }  else {
                 req.session.currentUserId = user._id;
-                // return res.json({ message: "User authenticated" });
                 return next();
             }
         });
@@ -32,13 +32,16 @@ function emailValidation(req, res, next) {
 
         if (isEmailValid) {
 
-            let countUsers = User.find({ emailAddress: req.body.emailAddress }).count();
-            if(countUsers == 0) {
-                return next();            
-            }
-            let err = new Error('E-mail is already registed.');
-            err.status = 401;
-            return next(err);
+            User.count({ emailAddress: req.body.emailAddress }, function(err, countUsers) {
+                console.log('User count: ' + countUsers);
+                if(countUsers == 0) {
+                    return next();            
+                }
+                if (!err)
+                    err = new Error('E-mail is already registed.');
+                err.status = 401;
+                return next(err);
+            });
 
         }  else {
             let err = new Error('Invalid email format.');
