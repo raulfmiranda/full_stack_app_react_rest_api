@@ -19,7 +19,6 @@ const CourseDetail = (props) => {
                     </div>
                     <div className="course--description">
                         {props.course.description.split("\n\n").map(p => <p>{p}</p>)}
-                        
                     </div>
                 </div>
                 <div className="grid-25 grid-right">

@@ -7,8 +7,8 @@ import Header from './components/Header';
 // import CourseDetail from './components/CourseDetail';
 // import UserSignIn from './components/UserSignIn';
 // import UserSignUp from './components/UserSignUp';
-import CreateCourse from './components/CreateCourse';
-// import UpdateCourse from './components/UpdateCourse';
+// import CreateCourse from './components/CreateCourse';
+import UpdateCourse from './components/UpdateCourse';
 
 class App extends Component {
 
@@ -137,13 +137,47 @@ class App extends Component {
             });
     }
 
+    updateCourse = (course) => {
+        this.setState({ loading: true });
+
+        axios({
+            method: 'put',
+            url: `http://localhost:5000/api/courses/${course._id}`,
+            auth: {
+                username: this.state.currentUser.emailAddress,
+                password: this.state.currentUser.password
+            },
+            data: {
+                title: course.title,
+                description: course.description,
+                estimatedTime: course.estimatedTime,
+                materialsNeeded: course.materialsNeeded
+            }
+        }).then(response => {
+            console.log(response.data);
+
+            this.setState({
+                loading: false
+            });
+        })
+            .catch(error => {
+                if (error && error.response && error.response.data) {
+                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
+                } else {
+                    console.log('ERROR: ' + JSON.stringify(error));
+                }
+                this.setState({ loading: false });
+            });
+    }
+
     componentDidMount() {
-        // this.requestCourses();
+        this.requestCourses();
     }
 
     render() {
 
-        // const course = this.state.courses[0] && <CourseDetail course={this.state.courses[0]}/>;
+        // const courseDetail = this.state.courses[0] && <CourseDetail course={this.state.courses[0]}/>;
+        const updateCourse = this.state.courses[0] && <UpdateCourse course={this.state.courses[0]} updateCourse={this.updateCourse}/>;
 
         return (
             <div className="App">
@@ -153,8 +187,8 @@ class App extends Component {
                 {/* { course } */}
                 {/* <UserSignIn requestLogin={this.requestLogin} /> */}
                 {/* <UserSignUp registerUser={this.registerUser}/> */}
-                <CreateCourse createCourse={this.createCourse}/>
-                {/* <UpdateCourse/> */}
+                {/* <CreateCourse createCourse={this.createCourse}/> */}
+                { updateCourse }
             </div>
         );
     }
