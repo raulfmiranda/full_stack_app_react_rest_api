@@ -6,8 +6,8 @@ import Header from './components/Header';
 // import Courses from './components/Courses';
 // import CourseDetail from './components/CourseDetail';
 // import UserSignIn from './components/UserSignIn';
-import UserSignUp from './components/UserSignUp';
-// import CreateCourse from './components/CreateCourse';
+// import UserSignUp from './components/UserSignUp';
+import CreateCourse from './components/CreateCourse';
 // import UpdateCourse from './components/UpdateCourse';
 
 class App extends Component {
@@ -16,8 +16,7 @@ class App extends Component {
         super();
         this.state = {
             courses: [],
-            loading: false,
-            currentUser: null
+            loading: false
         };
     }
 
@@ -56,7 +55,8 @@ class App extends Component {
                 _id: response.data[0]._id,
                 emailAddress: response.data[0].emailAddress,
                 firstName: response.data[0].firstName,
-                lastName: response.data[0].lastName
+                lastName: response.data[0].lastName,
+                password
             };
 
             this.setState({
@@ -100,6 +100,36 @@ class App extends Component {
         }
     }
 
+    createCourse = (course) => {
+        this.setState({ loading: true });
+
+        if (!course) {
+            console.log("No course!");
+            this.setState({ loading: false });
+        } else {
+            axios({
+                method: 'post',
+                url: `http://localhost:5000/api/courses201`,
+                data: {
+                    title: course.title,
+                    description: course.description,
+                    estimatedTime: course.estimatedTime,
+                    materialsNeeded: course.materialsNeeded
+                },
+            }).then(response => {
+                console.log(response.data);
+    
+                this.setState({
+                    loading: false
+                });
+            })
+                .catch(error => {
+                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
+                    this.setState({ loading: false });
+                });
+        }
+    }
+
     componentDidMount() {
         // this.requestCourses();
     }
@@ -115,8 +145,8 @@ class App extends Component {
                 {/* <Courses courses={this.state.courses}/> */}
                 {/* { course } */}
                 {/* <UserSignIn requestLogin={this.requestLogin} /> */}
-                <UserSignUp registerUser={this.registerUser}/>
-                {/* <CreateCourse/> */}
+                {/* <UserSignUp registerUser={this.registerUser}/> */}
+                <CreateCourse createCourse={this.createCourse}/>
                 {/* <UpdateCourse/> */}
             </div>
         );

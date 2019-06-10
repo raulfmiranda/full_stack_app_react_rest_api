@@ -69,16 +69,17 @@ function userCourseOwner(req, res, next) {
     }
 }
 
-// function requiresLogin(req, res, next) {
-//     if (req.session && req.session.currentUserId) {
-//         return next();
-//     } else {
-//         var err = new Error('You must be logged in to view this page.');
-//         err.status = 401;
-//         return next(err);
-//     }
-// }
+function requiresLogin(req, res, next) {
+    if (req.session && req.session.currentUserId) {
+        return next();
+    } else {
+        var err = new Error('You must be logged in to view this page.');
+        err.status = 401;
+        return next(err);
+    }
+}
 
 module.exports.checkCredentials = checkCredentials;
 module.exports.emailValidation = emailValidation;
 module.exports.userCourseOwner = userCourseOwner;
+module.exports.requiresLogin = requiresLogin;
