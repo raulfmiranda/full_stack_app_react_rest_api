@@ -79,7 +79,7 @@ router.get("/courses/:id200", function(req, res, next) {
 
 // POST /api/courses201
 // Creates a course, sets the Location header to the URI for the course, and returns no content
-router.post("/courses201", mid.requiresLogin, function(req, res, next) {
+router.post("/courses201", mid.checkCredentials, function(req, res, next) {
 
     if (req.body.title && req.body.description) {
 

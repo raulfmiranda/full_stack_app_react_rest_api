@@ -70,6 +70,7 @@ function userCourseOwner(req, res, next) {
 }
 
 function requiresLogin(req, res, next) {
+    console.log("session: " + JSON.stringify(req.session));
     if (req.session && req.session.currentUserId) {
         return next();
     } else {

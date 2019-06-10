@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Validation from './Validation';
 
 class CreateCourse extends Component {
 
@@ -10,7 +11,8 @@ class CreateCourse extends Component {
                 description: "My long description",
                 estimatedTime: "6",
                 materialsNeeded: "Lots of stuff"
-            }
+            },
+            emptyValues: []
         }
     }
 
@@ -27,20 +29,25 @@ class CreateCourse extends Component {
         });
     }
 
+    submitHandler = () => {
+        
+        if (this.state.course.title === "" || this.state.course.description === "") {
+            if (this.state.course.title === "")
+                this.setState({emptyValues: ["Title"]});
+            else
+                this.setState({emptyValues: ["Description"]});
+        } else {
+            this.setState({emptyValues: []});
+            this.props.createCourse(this.state.course);
+        }
+    }
+
     render() {
         return (
             <div className="bounds course--detail">
                 <h1>Create Course</h1>
                 <div>
-                    <div>
-                        <h2 className="validation--errors--label">Validation errors</h2>
-                        <div className="validation-errors">
-                            <ul>
-                                <li>Please provide a value for "Title"</li>
-                                <li>Please provide a value for "Description"</li>
-                            </ul>
-                        </div>
-                    </div>
+                    <Validation emptyValues={this.state.emptyValues}/>
                     <form>
                         <div className="grid-66">
                             <div className="course--header">
@@ -103,7 +110,7 @@ class CreateCourse extends Component {
                             </div>
                         </div>
                         <div className="grid-100 pad-bottom">
-                            <button className="button" type="button" onClick={() => this.props.createCourse(this.state.course)}>Create Course</button>
+                            <button className="button" type="button" onClick={this.submitHandler}>Create Course</button>
                             <button className="button button-secondary" onClick={() => console.log("Cancel!")}>Cancel</button>
                         </div>
                     </form>

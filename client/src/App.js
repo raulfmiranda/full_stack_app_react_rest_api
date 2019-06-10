@@ -16,7 +16,11 @@ class App extends Component {
         super();
         this.state = {
             courses: [],
-            loading: false
+            loading: false,
+            currentUser: {
+                emailAddress: "jm@email.com",
+                password: "1"
+            }
         };
     }
 
@@ -103,31 +107,34 @@ class App extends Component {
     createCourse = (course) => {
         this.setState({ loading: true });
 
-        if (!course) {
-            console.log("No course!");
-            this.setState({ loading: false });
-        } else {
-            axios({
-                method: 'post',
-                url: `http://localhost:5000/api/courses201`,
-                data: {
-                    title: course.title,
-                    description: course.description,
-                    estimatedTime: course.estimatedTime,
-                    materialsNeeded: course.materialsNeeded
-                },
-            }).then(response => {
-                console.log(response.data);
-    
-                this.setState({
-                    loading: false
-                });
-            })
-                .catch(error => {
+        axios({
+            method: 'post',
+            url: `http://localhost:5000/api/courses201`,
+            auth: {
+                username: this.state.currentUser.emailAddress,
+                password: this.state.currentUser.password
+            },
+            data: {
+                title: course.title,
+                description: course.description,
+                estimatedTime: course.estimatedTime,
+                materialsNeeded: course.materialsNeeded
+            }
+        }).then(response => {
+            console.log(response.data);
+
+            this.setState({
+                loading: false
+            });
+        })
+            .catch(error => {
+                if (error && error.response && error.response.data) {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                    this.setState({ loading: false });
-                });
-        }
+                } else {
+                    console.log('ERROR: ' + JSON.stringify(error));
+                }
+                this.setState({ loading: false });
+            });
     }
 
     componentDidMount() {

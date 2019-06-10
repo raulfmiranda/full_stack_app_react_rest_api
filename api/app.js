@@ -51,6 +51,7 @@ app.use(session({
 // =================================================================================
 // For CORS (Cross-origin resource sharing)
 app.use(cors());
+app.options('/api/courses201', cors());
 
 // =================================================================================
 // setup a friendly greeting for the root route
