@@ -70,34 +70,35 @@ class App extends Component {
             });
     }
 
-    // TODO: registerUser method!!!
+    registerUser = (user) => {
+        this.setState({ loading: true });
 
-    // registerUser = (user) => {
-    //     this.setState({ loading: true });
-
-    //     axios({
-    //         method: 'get',
-    //         url: `http://localhost:5000/api/users201`
-    //     }).then(response => {
-    //         console.log(response.data);
-
-    //         const currentUser = {
-    //             _id: response.data[0]._id,
-    //             emailAddress: response.data[0].emailAddress,
-    //             firstName: response.data[0].firstName,
-    //             lastName: response.data[0].lastName
-    //         };
-
-    //         this.setState({
-    //             loading: false,
-    //             currentUser
-    //         });
-    //     })
-    //         .catch(error => {
-    //             console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-    //             this.setState({ loading: false });
-    //         });
-    // }
+        if (user.confirmPassword !== user.password) {
+            console.log("Password must be equals to confirm password!");
+            this.setState({ loading: false });
+        } else {
+            axios({
+                method: 'post',
+                url: `http://localhost:5000/api/users201`,
+                data: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    emailAddress: user.emailAddress,
+                    password: user.password
+                },
+            }).then(response => {
+                console.log(response.data);
+    
+                this.setState({
+                    loading: false
+                });
+            })
+                .catch(error => {
+                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
+                    this.setState({ loading: false });
+                });
+        }
+    }
 
     componentDidMount() {
         // this.requestCourses();
@@ -114,7 +115,7 @@ class App extends Component {
                 {/* <Courses courses={this.state.courses}/> */}
                 {/* { course } */}
                 {/* <UserSignIn requestLogin={this.requestLogin} /> */}
-                <UserSignUp/>
+                <UserSignUp registerUser={this.registerUser}/>
                 {/* <CreateCourse/> */}
                 {/* <UpdateCourse/> */}
             </div>

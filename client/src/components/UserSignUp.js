@@ -1,27 +1,120 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-const UserSignUp = (props) => {
+class UserSignUp extends Component {
 
-    return (
-        <div className="bounds">
-            <div className="grid-33 centered signin">
-                <h1>Sign Up</h1>
-                <div>
-                    <form>
-                        <div><input id="firstName" name="firstName" type="text" className="" placeholder="First Name" value=""/></div>
-                        <div><input id="lastName" name="lastName" type="text" className="" placeholder="Last Name" value=""/></div>
-                        <div><input id="emailAddress" name="emailAddress" type="text" className="" placeholder="Email Address" value=""/></div>
-                        <div><input id="password" name="password" type="password" className="" placeholder="Password" value=""/></div>
-                        <div><input id="confirmPassword" name="confirmPassword" type="password" className="" placeholder="Confirm Password"
-                            value=""/></div>
-                        <div className="grid-100 pad-bottom"><button className="button" type="submit">Sign Up</button><button className="button button-secondary" onclick="event.preventDefault(); location.href='index.html';">Cancel</button></div>
-                    </form>
+    constructor () {
+        super();
+        this.state = {
+            user: {
+                firstName: "Jose", 
+                lastName: "Maria",
+                emailAddress: "jm@email.com", 
+                password: "1",
+                confirmPassword: "1"
+            }
+        }
+    }
+
+    changeHandler = e => {
+
+        const name = e.target.name;
+        const value = e.target.value;
+
+        this.setState({
+            user: {
+                ...this.state.user,
+                [name]: value
+            }
+        });
+    }
+
+    render() {
+
+        return (
+            <div className="bounds">
+                <div className="grid-33 centered signin">
+                    <h1>Sign Up</h1>
+                    <div>
+                        <form>
+                            <div>
+                                <input 
+                                    id="firstName" 
+                                    name="firstName" 
+                                    type="text" 
+                                    placeholder="First Name" 
+                                    onChange={this.changeHandler} 
+                                    value={this.state.user.firstName.value} 
+                                    defaultValue="Jose"
+                                />
+                            </div>
+                            <div>
+                                <input 
+                                    id="lastName" 
+                                    name="lastName" 
+                                    type="text" 
+                                    placeholder="Last Name" 
+                                    onChange={this.changeHandler} 
+                                    value={this.state.user.lastName.value} 
+                                    defaultValue="Maria"
+                                />
+                            </div>
+                            <div>
+                                <input 
+                                    id="emailAddress" 
+                                    name="emailAddress" 
+                                    type="text" 
+                                    placeholder="Email Address" 
+                                    onChange={this.changeHandler} 
+                                    value={this.state.user.emailAddress.value} 
+                                    defaultValue="jm@email.com"
+                                />
+                            </div>
+                            <div>
+                                <input 
+                                    id="password" 
+                                    name="password" 
+                                    type="password" 
+                                    placeholder="Password" 
+                                    onChange={this.changeHandler} 
+                                    value={this.state.user.password.value} 
+                                    defaultValue="1"
+                                />
+                            </div>
+                            <div>
+                                <input 
+                                    id="confirmPassword" 
+                                    name="confirmPassword" 
+                                    type="password" 
+                                    placeholder="Confirm Password" 
+                                    onChange={this.changeHandler}
+                                    value={this.state.user.password.value} 
+                                    defaultValue="1"
+                                />
+                            </div>
+                            <div className="grid-100 pad-bottom">
+                                <button 
+                                    className="button" 
+                                    type="button" 
+                                    onClick={() => this.props.registerUser(this.state.user)}>
+                                    Sign Up
+                                </button>
+                                {/* <button className="button" type="button" onClick={() => console.log(JSON.stringify(this.state.user))}>Sign Up</button> */}
+                                <button 
+                                    className="button button-secondary" 
+                                    type="button" 
+                                    onClick={() => console.log("Cancel!")}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <p>&nbsp;</p>
+                    <p>Already have a user account? <a href="sign-in.html">Click here</a> to sign in!</p>
                 </div>
-                <p>&nbsp;</p>
-                <p>Already have a user account? <a href="sign-in.html">Click here</a> to sign in!</p>
             </div>
-        </div>
-    );
+        );
+     }
+    
 }
 
 export default UserSignUp;
