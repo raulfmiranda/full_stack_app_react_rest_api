@@ -10,6 +10,7 @@ import UserSignIn from './components/UserSignIn';
 import UserSignUp from './components/UserSignUp';
 import CreateCourse from './components/CreateCourse';
 import UpdateCourse from './components/UpdateCourse';
+import Message from './components/Message';
 
 class App extends Component {
 
@@ -206,6 +207,9 @@ class App extends Component {
 
         const courseDetail = this.state.courses[0] && <CourseDetail course={this.state.courses[0]} deleteCourse={this.deleteCourse}/>;
         const updateCourse = this.state.courses[0] && <UpdateCourse course={this.state.courses[0]} updateCourse={this.updateCourse}/>;
+        const erroMsg = { title: "Error", body: "Sorry! We just encountered an unexpected error." };
+        const forbiddenMsg = { title: "Forbidden", body: "Oh oh! You can't access this page." };
+        const notFoundMsg = { title: "Not Found", body: "Sorry! We couldn't find the page you're looking for." };
 
         return (
             <div className="App">
@@ -219,6 +223,9 @@ class App extends Component {
                         <Route path="/create" component={ () => <CreateCourse createCourse={this.createCourse}/>} />
                         <Route path="/update" component={ () => updateCourse } />
                         <Route path="/detail" component={ () => courseDetail } />
+                        <Route path="/error" component={ () => <Message message={erroMsg}/> } />
+                        <Route path="/forbidden" component={ () => <Message message={forbiddenMsg}/> } />
+                        <Route path="*" component={ () => <Message message={notFoundMsg}/> } />
                     </Switch>
                 </Router>
             </div>
