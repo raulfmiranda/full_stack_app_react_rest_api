@@ -1,7 +1,13 @@
 import React from 'react';
 import { Link } from "react-router-dom";
+import UserSignOut from "./UserSignOut";
 
-const Header = () => {
+const Header = ({ currentUser, signOut }) => {
+
+    const signup = !currentUser && <Link to="/signup" className="signup">Sign Up</Link>;
+    const signin = !currentUser && <Link to="/signin" className="signin">Sign In</Link>;
+    const welcome = currentUser && <span>Welcome { currentUser.firstName } { currentUser.lastName }!</span>;
+    const signout = currentUser && <UserSignOut signOut={signOut}/>;
 
     return (
         <div className="header">
@@ -10,8 +16,10 @@ const Header = () => {
                     <h1 className="header--logo">Courses</h1>
                 </Link>
                 <nav>
-                    <Link to="/signup" className="signup">Sign Up</Link>
-                    <Link to="/signin" className="signin">Sign In</Link>
+                    { signup }
+                    { signin }
+                    { welcome }
+                    { signout }
                 </nav>
             </div>
         </div>

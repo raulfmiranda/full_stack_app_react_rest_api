@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
-const UserSignOut = (props) => {
+const UserSignOut = ({ signOut }) => {
 
     return (
-        <h4>UserSignOut component</h4>
+        <Link to="/" onClick={signOut} className="signout">Sign Out</Link>
     );
 }
 

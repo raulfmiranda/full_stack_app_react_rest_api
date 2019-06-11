@@ -19,10 +19,15 @@ class App extends Component {
         this.state = {
             courses: [],
             loading: false,
-            currentUser: {
-                emailAddress: "jm@email.com",
-                password: "1"
-            }
+            currentUser: null
+            // currentUser: {
+            //     emailAddress: "jm@email.com",
+            //     password: "1"
+            // }
+        };
+        this.baseUrl = {
+            API: "http://localhost:5000/api",
+            React: "http://localhost:3000"
         };
     }
 
@@ -30,7 +35,7 @@ class App extends Component {
 
         this.setState({ loading: true });
 
-        axios.get(`http://localhost:5000/api/courses200`)
+        axios.get(this.baseUrl.API + "/courses200")
             .then(response => {
                 this.setState({
                     courses: response.data,
@@ -40,6 +45,7 @@ class App extends Component {
             .catch(error => {
                 console.log('Error fetching and parsing data', error);
                 this.setState({ loading: false });
+                window.location.href = this.baseUrl.React + "/error";
             });
     }
 
@@ -49,7 +55,7 @@ class App extends Component {
 
         axios({
             method: 'get',
-            url: `http://localhost:5000/api/users200`,
+            url: this.baseUrl.API + "/users200",
             auth: {
                 username: email,
                 password: password
@@ -73,6 +79,7 @@ class App extends Component {
             .catch(error => {
                 console.log('ERROR: ' + JSON.stringify(error.response.data.message));
                 this.setState({ loading: false });
+                window.location.href = this.baseUrl.React + "/error";
             });
     }
 
@@ -85,7 +92,7 @@ class App extends Component {
         } else {
             axios({
                 method: 'post',
-                url: `http://localhost:5000/api/users201`,
+                url: this.baseUrl.API + "/users201",
                 data: {
                     firstName: user.firstName,
                     lastName: user.lastName,
@@ -102,6 +109,7 @@ class App extends Component {
                 .catch(error => {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
                     this.setState({ loading: false });
+                    window.location.href = this.baseUrl.React + "/error";
                 });
         }
     }
@@ -109,26 +117,27 @@ class App extends Component {
     createCourse = (course) => {
         this.setState({ loading: true });
 
-        axios({
-            method: 'post',
-            url: `http://localhost:5000/api/courses201`,
-            auth: {
-                username: this.state.currentUser.emailAddress,
-                password: this.state.currentUser.password
-            },
-            data: {
-                title: course.title,
-                description: course.description,
-                estimatedTime: course.estimatedTime,
-                materialsNeeded: course.materialsNeeded
-            }
-        }).then(response => {
-            console.log(response.data);
-
-            this.setState({
-                loading: false
-            });
-        })
+        if (this.state.currentUser) {
+            axios({
+                method: 'post',
+                url: this.baseUrl.API + "/courses201",
+                auth: {
+                    username: this.state.currentUser.emailAddress,
+                    password: this.state.currentUser.password
+                },
+                data: {
+                    title: course.title,
+                    description: course.description,
+                    estimatedTime: course.estimatedTime,
+                    materialsNeeded: course.materialsNeeded
+                }
+            }).then(response => {
+                console.log(response.data);
+    
+                this.setState({
+                    loading: false
+                });
+            })
             .catch(error => {
                 if (error && error.response && error.response.data) {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
@@ -136,7 +145,11 @@ class App extends Component {
                     console.log('ERROR: ' + JSON.stringify(error));
                 }
                 this.setState({ loading: false });
+                window.location.href = this.baseUrl.React + "/error";
             });
+        } else {
+            window.location.href = this.baseUrl.React + "/forbidden";
+        }
     }
 
     updateCourse = (course) => {
@@ -144,7 +157,7 @@ class App extends Component {
 
         axios({
             method: 'put',
-            url: `http://localhost:5000/api/courses/${course._id}`,
+            url: this.baseUrl.API + `/courses/${course._id}`,
             auth: {
                 username: this.state.currentUser.emailAddress,
                 password: this.state.currentUser.password
@@ -169,6 +182,7 @@ class App extends Component {
                     console.log('ERROR: ' + JSON.stringify(error));
                 }
                 this.setState({ loading: false });
+                window.location.href = this.baseUrl.React + "/error";
             });
     }
 
@@ -177,7 +191,7 @@ class App extends Component {
 
         axios({
             method: 'delete',
-            url: `http://localhost:5000/api/courses/${course._id}`,
+            url: this.baseUrl.API + `/courses/${course._id}`,
             auth: {
                 username: this.state.currentUser.emailAddress,
                 password: this.state.currentUser.password
@@ -196,7 +210,12 @@ class App extends Component {
                     console.log('ERROR: ' + JSON.stringify(error));
                 }
                 this.setState({ loading: false });
+                window.location.href = this.baseUrl.React + "/error";
             });
+    }
+
+    signOut = () => {
+        this.setState({ currentUser: null });
     }
 
     componentDidMount() {
@@ -207,6 +226,7 @@ class App extends Component {
 
         const courseDetail = this.state.courses[0] && <CourseDetail course={this.state.courses[0]} deleteCourse={this.deleteCourse}/>;
         const updateCourse = this.state.courses[0] && <UpdateCourse course={this.state.courses[0]} updateCourse={this.updateCourse}/>;
+        
         const erroMsg = { title: "Error", body: "Sorry! We just encountered an unexpected error." };
         const forbiddenMsg = { title: "Forbidden", body: "Oh oh! You can't access this page." };
         const notFoundMsg = { title: "Not Found", body: "Sorry! We couldn't find the page you're looking for." };
@@ -214,7 +234,7 @@ class App extends Component {
         return (
             <div className="App">
                 <Router>
-                    <Header />
+                    <Header currentUser={this.state.currentUser} signOut={this.signOut}/>
                     <hr />
                     <Switch>
                         <Route exact path="/" component={ () => <Courses courses={this.state.courses}/> } />
