@@ -1,17 +1,17 @@
 import React from 'react';
-// import { NavLink } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
-
-const Header = (props) => {
+const Header = () => {
 
     return (
         <div className="header">
             <div className="bounds">
-                <h1 className="header--logo">Courses</h1>
+                <Link to="/">
+                    <h1 className="header--logo">Courses</h1>
+                </Link>
                 <nav>
-                    <a className="signup" href="sign-up.html">Sign Up</a>
-                    <a className="signin" href="sign-in.html">Sign In</a>
-                    {/* <NavLink to='/dogs' onClick={() => props.onSearch('dogs')}>Dogs</NavLink> */}
+                    <Link to="/signup" className="signup">Sign Up</Link>
+                    <Link to="/signin" className="signin">Sign In</Link>
                 </nav>
             </div>
         </div>

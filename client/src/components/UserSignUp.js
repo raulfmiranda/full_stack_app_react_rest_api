@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 
 class UserSignUp extends Component {
 
@@ -98,13 +99,7 @@ class UserSignUp extends Component {
                                     onClick={() => this.props.registerUser(this.state.user)}>
                                     Sign Up
                                 </button>
-                                {/* <button className="button" type="button" onClick={() => console.log(JSON.stringify(this.state.user))}>Sign Up</button> */}
-                                <button 
-                                    className="button button-secondary" 
-                                    type="button" 
-                                    onClick={() => console.log("Cancel!")}>
-                                    Cancel
-                                </button>
+                                <Link to="/" className="button button-secondary">Cancel</Link>
                             </div>
                         </form>
                     </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 const UserSignIn = ({ requestLogin }) => {
 
@@ -15,12 +16,12 @@ const UserSignIn = ({ requestLogin }) => {
                         <div><input id="password" name="password" type="password" ref={passwordInput} placeholder="Password" defaultValue="1"/></div>
                         <div className="grid-100 pad-bottom">
                             <button className="button" type="button" onClick={() => requestLogin(emailInput.current.value, passwordInput.current.value)}>Sign In</button>
-                            <button className="button button-secondary" type="button" onClick={() => console.log('canceled!')}>Cancel</button>
+                            <Link to="/" className="button button-secondary">Cancel</Link>
                         </div>
                     </form>
                 </div>
                 <p>&nbsp;</p>
-                <p>Don't have a user account? <a href="sign-up.html">Click here</a> to sign up!</p>
+                <p>Don't have a user account? <Link to="/signup">Click here</Link> to sign up!</p>
             </div>
         </div>
     );

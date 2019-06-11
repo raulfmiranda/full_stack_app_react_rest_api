@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 const CourseDetail = (props) => {
 
@@ -6,8 +7,13 @@ const CourseDetail = (props) => {
         <div>
             <div className="actions--bar">
                 <div className="bounds">
-                    <div className="grid-100"><span><a className="button" href="update-course.html">Update Course</a><a className="button" href="#">Delete Course</a></span><a
-                        className="button button-secondary" href="index.html">Return to List</a></div>
+                    <div className="grid-100">
+                        <span>
+                            <Link to="/update" className="button">Update Course</Link>
+                            <button className="button" type="button" onClick={() => props.deleteCourse(props.course)}>Delete Course</button>
+                        </span>
+                            <Link to="/" className="button button-secondary">Return to List</Link>
+                    </div>
                 </div>
             </div>
             <div className="bounds course--detail">
@@ -18,7 +24,7 @@ const CourseDetail = (props) => {
                         <p>By {props.course.user.firstName} {props.course.user.lastName}</p>
                     </div>
                     <div className="course--description">
-                        {props.course.description.split("\n\n").map(p => <p>{p}</p>)}
+                        {props.course.description.split("\n\n").map((p, i) => <p key={i}>{p}</p>)}
                     </div>
                 </div>
                 <div className="grid-25 grid-right">
@@ -31,7 +37,7 @@ const CourseDetail = (props) => {
                             <li className="course--stats--list--item">
                                 <h4>Materials Needed</h4>
                                 <ul>
-                                    {props.course.materialsNeeded.split("\n*").map(s => <li>{s.replace('*', '')}</li>)}
+                                    {props.course.materialsNeeded.split("\n*").map((s, i) => <li key={i}>{s.replace('*', '')}</li>)}
                                 </ul>
                             </li>
                         </ul>

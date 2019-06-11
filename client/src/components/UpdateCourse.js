@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 import Validation from './Validation';
 
 class UpdateCourse extends Component {
@@ -118,7 +119,7 @@ class UpdateCourse extends Component {
                         </div>
                         <div className="grid-100 pad-bottom">
                             <button className="button" type="button" onClick={this.submitHandler}>Update Course</button>
-                            <button className="button button-secondary" type="button" onClick={() => console.log("Cancel!")}>Cancel</button>
+                            <Link to="/" className="button button-secondary">Cancel</Link>
                         </div>
                     </form>
                 </div>

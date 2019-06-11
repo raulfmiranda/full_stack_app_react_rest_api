@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from 'axios';
 import './styles/global.css';
 
 import Header from './components/Header';
-// import Courses from './components/Courses';
-// import CourseDetail from './components/CourseDetail';
-// import UserSignIn from './components/UserSignIn';
-// import UserSignUp from './components/UserSignUp';
-// import CreateCourse from './components/CreateCourse';
+import Courses from './components/Courses';
+import CourseDetail from './components/CourseDetail';
+import UserSignIn from './components/UserSignIn';
+import UserSignUp from './components/UserSignUp';
+import CreateCourse from './components/CreateCourse';
 import UpdateCourse from './components/UpdateCourse';
 
 class App extends Component {
@@ -170,25 +171,56 @@ class App extends Component {
             });
     }
 
+    deleteCourse = (course) => {
+        this.setState({ loading: true });
+
+        axios({
+            method: 'delete',
+            url: `http://localhost:5000/api/courses/${course._id}`,
+            auth: {
+                username: this.state.currentUser.emailAddress,
+                password: this.state.currentUser.password
+            }
+        }).then(response => {
+            console.log(response.data);
+
+            this.setState({
+                loading: false
+            });
+        })
+            .catch(error => {
+                if (error && error.response && error.response.data) {
+                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
+                } else {
+                    console.log('ERROR: ' + JSON.stringify(error));
+                }
+                this.setState({ loading: false });
+            });
+    }
+
     componentDidMount() {
         this.requestCourses();
     }
 
     render() {
 
-        // const courseDetail = this.state.courses[0] && <CourseDetail course={this.state.courses[0]}/>;
+        const courseDetail = this.state.courses[0] && <CourseDetail course={this.state.courses[0]} deleteCourse={this.deleteCourse}/>;
         const updateCourse = this.state.courses[0] && <UpdateCourse course={this.state.courses[0]} updateCourse={this.updateCourse}/>;
 
         return (
             <div className="App">
-                <Header />
-                <hr />
-                {/* <Courses courses={this.state.courses}/> */}
-                {/* { course } */}
-                {/* <UserSignIn requestLogin={this.requestLogin} /> */}
-                {/* <UserSignUp registerUser={this.registerUser}/> */}
-                {/* <CreateCourse createCourse={this.createCourse}/> */}
-                { updateCourse }
+                <Router>
+                    <Header />
+                    <hr />
+                    <Switch>
+                        <Route exact path="/" component={ () => <Courses courses={this.state.courses}/> } />
+                        <Route path="/signin" component={ () => <UserSignIn requestLogin={this.requestLogin} /> } />
+                        <Route path="/signup" component={ () => <UserSignUp registerUser={this.registerUser}/> } />
+                        <Route path="/create" component={ () => <CreateCourse createCourse={this.createCourse}/>} />
+                        <Route path="/update" component={ () => updateCourse } />
+                        <Route path="/detail" component={ () => courseDetail } />
+                    </Switch>
+                </Router>
             </div>
         );
     }
