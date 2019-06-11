@@ -79,7 +79,7 @@ router.get("/courses/:id200", function(req, res, next) {
 
 // POST /api/courses201
 // Creates a course, sets the Location header to the URI for the course, and returns no content
-router.post("/courses201", mid.checkCredentials, function(req, res, next) {
+router.post("/courses201", mid.requiresLogin, function(req, res, next) {
 
     if (req.body.title && req.body.description) {
 
@@ -120,7 +120,7 @@ router.put("/courses/:id204", mid.checkCredentials, mid.userCourseOwner, functio
 
 // DELETE /api/courses/:id204
 // Deletes a course and returns no content
-router.delete("/courses/:id204", mid.checkCredentials, mid.userCourseOwner, function(req, res, next) {
+router.delete("/courses/:id204", mid.requiresLogin, mid.userCourseOwner, function(req, res, next) {
 
     req.course.remove(function(err, result){
 		if(err) return next(err);

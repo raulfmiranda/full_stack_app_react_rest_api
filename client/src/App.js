@@ -32,7 +32,7 @@ class App extends Component {
     }
 
     requestCourses = () => {
-
+        console.log("REQUEST COURSES");
         this.setState({ loading: true });
 
         axios.get(this.baseUrl.API + "/courses200")
@@ -45,7 +45,7 @@ class App extends Component {
             .catch(error => {
                 console.log('Error fetching and parsing data', error);
                 this.setState({ loading: false });
-                window.location.href = this.baseUrl.React + "/error";
+                // window.location.href = this.baseUrl.React + "/error";
             });
     }
 
@@ -59,7 +59,8 @@ class App extends Component {
             auth: {
                 username: email,
                 password: password
-            }
+            },
+            withCredentials: true
         }).then(response => {
             console.log(response.data);
 
@@ -75,12 +76,19 @@ class App extends Component {
                 loading: false,
                 currentUser
             });
+            
+            // this.props.history.push("/");
+            // window.location.href = this.baseUrl.React + "/";
         })
-            .catch(error => {
+        .catch(error => {
+            if (error && error.response && error.response.data) {
                 console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                this.setState({ loading: false });
-                window.location.href = this.baseUrl.React + "/error";
-            });
+            } else {
+                console.log('ERROR: ' + JSON.stringify(error));
+            }
+            this.setState({ loading: false });
+            // window.location.href = this.baseUrl.React + "/error";
+        });
     }
 
     registerUser = (user) => {
@@ -109,7 +117,7 @@ class App extends Component {
                 .catch(error => {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
                     this.setState({ loading: false });
-                    window.location.href = this.baseUrl.React + "/error";
+                    // window.location.href = this.baseUrl.React + "/error";
                 });
         }
     }
@@ -121,6 +129,46 @@ class App extends Component {
             axios({
                 method: 'post',
                 url: this.baseUrl.API + "/courses201",
+                data: {
+                    title: course.title,
+                    description: course.description,
+                    estimatedTime: course.estimatedTime,
+                    materialsNeeded: course.materialsNeeded
+                },
+                withCredentials: true
+            }).then(response => {
+    
+                this.setState({
+                    loading: false
+                });
+
+                let coursesTemp = this.state.courses;
+                coursesTemp.push(response.data);
+                this.setState({ courses: coursesTemp });
+                window.location.href = this.baseUrl.React + "/";
+            })
+            .catch(error => {
+                if (error && error.response && error.response.data) {
+                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
+                } else {
+                    console.log('ERROR: ' + JSON.stringify(error));
+                }
+                this.setState({ loading: false });
+                // window.location.href = this.baseUrl.React + "/error";
+            });
+        } else {
+            console.log("Create Course Forbidden!");
+            // window.location.href = this.baseUrl.React + "/forbidden";
+        }
+    }
+
+    updateCourse = (course) => {
+        this.setState({ loading: true });
+
+        if (this.state.currentUser) {
+            axios({
+                method: 'put',
+                url: this.baseUrl.API + `/courses/${course._id}`,
                 auth: {
                     username: this.state.currentUser.emailAddress,
                     password: this.state.currentUser.password
@@ -145,64 +193,30 @@ class App extends Component {
                     console.log('ERROR: ' + JSON.stringify(error));
                 }
                 this.setState({ loading: false });
-                window.location.href = this.baseUrl.React + "/error";
+                // window.location.href = this.baseUrl.React + "/error";
             });
         } else {
-            window.location.href = this.baseUrl.React + "/forbidden";
+            this.setState({ loading: false });
+            // window.location.href = this.baseUrl.React + "/forbidden";
         }
-    }
-
-    updateCourse = (course) => {
-        this.setState({ loading: true });
-
-        axios({
-            method: 'put',
-            url: this.baseUrl.API + `/courses/${course._id}`,
-            auth: {
-                username: this.state.currentUser.emailAddress,
-                password: this.state.currentUser.password
-            },
-            data: {
-                title: course.title,
-                description: course.description,
-                estimatedTime: course.estimatedTime,
-                materialsNeeded: course.materialsNeeded
-            }
-        }).then(response => {
-            console.log(response.data);
-
-            this.setState({
-                loading: false
-            });
-        })
-            .catch(error => {
-                if (error && error.response && error.response.data) {
-                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                } else {
-                    console.log('ERROR: ' + JSON.stringify(error));
-                }
-                this.setState({ loading: false });
-                window.location.href = this.baseUrl.React + "/error";
-            });
     }
 
     deleteCourse = (course) => {
         this.setState({ loading: true });
 
-        axios({
-            method: 'delete',
-            url: this.baseUrl.API + `/courses/${course._id}`,
-            auth: {
-                username: this.state.currentUser.emailAddress,
-                password: this.state.currentUser.password
-            }
-        }).then(response => {
-            console.log(response.data);
-
-            this.setState({
-                loading: false
-            });
-        })
+        if (this.state.currentUser) {
+            axios({
+                method: 'delete',
+                url: this.baseUrl.API + `/courses/${course._id}`,
+                withCredentials: true
+            }).then(response => {
+                console.log(response.data);
+    
+                this.setState({
+                    loading: false
+                });
+                window.location.href = this.baseUrl.React + "/";
+            })
             .catch(error => {
                 if (error && error.response && error.response.data) {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
@@ -210,8 +224,12 @@ class App extends Component {
                     console.log('ERROR: ' + JSON.stringify(error));
                 }
                 this.setState({ loading: false });
-                window.location.href = this.baseUrl.React + "/error";
+                // window.location.href = this.baseUrl.React + "/error";
             });
+        }  else {
+            this.setState({ loading: false });
+            // window.location.href = this.baseUrl.React + "/forbidden";
+        }
     }
 
     signOut = () => {
@@ -237,7 +255,7 @@ class App extends Component {
                     <Header currentUser={this.state.currentUser} signOut={this.signOut}/>
                     <hr />
                     <Switch>
-                        <Route exact path="/" component={ () => <Courses courses={this.state.courses}/> } />
+                        <Route exact path="/" component={ () => <Courses courses={this.state.courses} requestCourses={() => this.requestCourses}/> } />
                         <Route path="/signin" component={ () => <UserSignIn requestLogin={this.requestLogin} /> } />
                         <Route path="/signup" component={ () => <UserSignUp registerUser={this.registerUser}/> } />
                         <Route path="/create" component={ () => <CreateCourse createCourse={this.createCourse}/>} />

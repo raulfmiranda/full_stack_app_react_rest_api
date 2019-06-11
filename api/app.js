@@ -50,8 +50,21 @@ app.use(session({
 
 // =================================================================================
 // For CORS (Cross-origin resource sharing)
-app.use(cors());
-app.options('/api/courses201', cors());
+
+// var corsOptions = {
+//     origin: 'http://example.com',
+//     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+// }
+
+// app.use(cors());
+
+app.use(function(req, res, next){
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+	next();
+});
 
 // =================================================================================
 // setup a friendly greeting for the root route
