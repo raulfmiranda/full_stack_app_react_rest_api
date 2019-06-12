@@ -19,7 +19,8 @@ class App extends Component {
         this.state = {
             courses: [],
             loading: false,
-            currentUser: null
+            currentUser: null,
+            currentCourse: null
             // currentUser: {
             //     emailAddress: "jm@email.com",
             //     password: "1"
@@ -49,7 +50,7 @@ class App extends Component {
             });
     }
 
-    requestLogin = (email, password) => {
+    requestLogin = (email, password, callback) => {
 
         this.setState({ loading: true });
 
@@ -77,12 +78,14 @@ class App extends Component {
                 currentUser
             });
             
+            callback();
             // this.props.history.push("/");
             // window.location.href = this.baseUrl.React + "/";
         })
         .catch(error => {
             if (error && error.response && error.response.data) {
                 console.log('ERROR: ' + JSON.stringify(error.response.data.message));
+                alert(error.response.data.message);
             } else {
                 console.log('ERROR: ' + JSON.stringify(error));
             }
@@ -122,7 +125,7 @@ class App extends Component {
         }
     }
 
-    createCourse = (course) => {
+    createCourse = (course, callback) => {
         this.setState({ loading: true });
 
         if (this.state.currentUser) {
@@ -145,7 +148,9 @@ class App extends Component {
                 let coursesTemp = this.state.courses;
                 coursesTemp.push(response.data);
                 this.setState({ courses: coursesTemp });
-                window.location.href = this.baseUrl.React + "/";
+
+                callback();
+                // window.location.href = this.baseUrl.React + "/";
             })
             .catch(error => {
                 if (error && error.response && error.response.data) {
@@ -201,7 +206,7 @@ class App extends Component {
         }
     }
 
-    deleteCourse = (course) => {
+    deleteCourse = (course, callback) => {
         this.setState({ loading: true });
 
         if (this.state.currentUser) {
@@ -215,14 +220,15 @@ class App extends Component {
                 this.setState({
                     loading: false
                 });
-                window.location.href = this.baseUrl.React + "/";
+
+                callback();
             })
             .catch(error => {
+                console.log('ERROR: ' + JSON.stringify(error));
                 if (error && error.response && error.response.data) {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                } else {
-                    console.log('ERROR: ' + JSON.stringify(error));
-                }
+                } 
+
                 this.setState({ loading: false });
                 // window.location.href = this.baseUrl.React + "/error";
             });
@@ -230,6 +236,18 @@ class App extends Component {
             this.setState({ loading: false });
             // window.location.href = this.baseUrl.React + "/forbidden";
         }
+    }
+
+    setCurrentCourse = (courseId, callback) => {
+        let course = {};
+        for (let i = 0; i < this.state.courses.length; i++) {
+            if (this.state.courses[i]._id === courseId) {
+                course = this.state.courses[i];
+                break;
+            }
+        }
+        this.setState({currentCourse: course});
+        callback();
     }
 
     signOut = () => {
@@ -242,8 +260,8 @@ class App extends Component {
 
     render() {
 
-        const courseDetail = this.state.courses[0] && <CourseDetail course={this.state.courses[0]} deleteCourse={this.deleteCourse}/>;
-        const updateCourse = this.state.courses[0] && <UpdateCourse course={this.state.courses[0]} updateCourse={this.updateCourse}/>;
+        const courseDetail = this.state.currentCourse && <CourseDetail course={this.state.currentCourse} deleteCourse={this.deleteCourse}/>;
+        const updateCourse = this.state.currentCourse && <UpdateCourse course={this.state.currentCourse} updateCourse={this.updateCourse}/>;
         
         const erroMsg = { title: "Error", body: "Sorry! We just encountered an unexpected error." };
         const forbiddenMsg = { title: "Forbidden", body: "Oh oh! You can't access this page." };
@@ -255,7 +273,7 @@ class App extends Component {
                     <Header currentUser={this.state.currentUser} signOut={this.signOut}/>
                     <hr />
                     <Switch>
-                        <Route exact path="/" component={ () => <Courses courses={this.state.courses} requestCourses={() => this.requestCourses}/> } />
+                        <Route exact path="/" component={ () => <Courses courses={this.state.courses} currentUser={this.state.currentUser} setCurrentCourse={this.setCurrentCourse}/> } />
                         <Route path="/signin" component={ () => <UserSignIn requestLogin={this.requestLogin} /> } />
                         <Route path="/signup" component={ () => <UserSignUp registerUser={this.registerUser}/> } />
                         <Route path="/create" component={ () => <CreateCourse createCourse={this.createCourse}/>} />

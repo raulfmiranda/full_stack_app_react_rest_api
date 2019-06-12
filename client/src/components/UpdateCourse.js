@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import Validation from './Validation';
 
 class UpdateCourse extends Component {
@@ -9,13 +9,13 @@ class UpdateCourse extends Component {
         this.state = {
             course: {
                 user: {
-                    firstName: 'Joseph',
-                    lastName: 'Mariah'
+                    firstName: '',
+                    lastName: ''
                 },
-                title: "My course",
-                description: "My long description",
-                estimatedTime: "6",
-                materialsNeeded: "Lots of stuff"
+                title: '',
+                description: '',
+                estimatedTime: '',
+                materialsNeeded: ''
             },
             emptyValues: []
         }
@@ -43,7 +43,10 @@ class UpdateCourse extends Component {
                 this.setState({emptyValues: ["Description"]});
         } else {
             this.setState({emptyValues: []});
-            this.props.updateCourse(this.state.course);
+            this.props.updateCourse(this.state.course, () => {
+                // console.log(JSON.stringify(this.props.history));
+                // this.props.history.push('/');
+            });
         }
     }
 
@@ -72,7 +75,7 @@ class UpdateCourse extends Component {
                                         value={this.state.course.title}
                                     />
                                 </div>
-                                <p>By {this.state.course.user.firstName} {this.state.course.user.lastName}</p>
+                                { this.state.course.user && <p>By {this.state.course.user.firstName} {this.state.course.user.lastName}</p>}
                             </div>
                             <div className="course--description">
                                 <div>
@@ -128,4 +131,4 @@ class UpdateCourse extends Component {
     }
 }
 
-export default UpdateCourse;
+export default withRouter(UpdateCourse);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Validation from './Validation';
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 class CreateCourse extends Component {
 
@@ -39,7 +39,10 @@ class CreateCourse extends Component {
                 this.setState({emptyValues: ["Description"]});
         } else {
             this.setState({emptyValues: []});
-            this.props.createCourse(this.state.course);
+            this.props.createCourse(this.state.course, () => {
+                console.log(JSON.stringify(this.props.history));
+                this.props.history.push('/');
+            });
         }
     }
 
@@ -122,4 +125,4 @@ class CreateCourse extends Component {
 
 }
 
-export default CreateCourse;
+export default withRouter(CreateCourse);
