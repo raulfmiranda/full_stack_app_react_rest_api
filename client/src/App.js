@@ -206,22 +206,31 @@ class App extends Component {
         }
     }
 
-    deleteCourse = (course, callback) => {
+    deleteCourse = (callback) => {
+
         this.setState({ loading: true });
 
         if (this.state.currentUser) {
             axios({
                 method: 'delete',
-                url: this.baseUrl.API + `/courses/${course._id}`,
+                url: this.baseUrl.API + `/courses/${this.state.currentCourse._id}`,
                 withCredentials: true
             }).then(response => {
                 console.log(response.data);
-    
-                this.setState({
-                    loading: false
-                });
 
-                callback();
+                let coursesAfterDelete = this.state.courses;
+                for (let i = 0; i < this.state.courses.length; i++) {
+                    if (this.state.currentCourse._id === this.state.courses[i]._id) {
+                        coursesAfterDelete.splice(i, 1);
+                        break;
+                    }
+                }
+
+                this.setState({
+                    loading: false,
+                    courses: coursesAfterDelete,
+                }, () => { callback() });
+            
             })
             .catch(error => {
                 console.log('ERROR: ' + JSON.stringify(error));

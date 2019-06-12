@@ -4,7 +4,7 @@ import { Link, withRouter } from "react-router-dom";
 class Courses extends Component {
 
     clickDetailHandler = e => {
-        if (e) {
+        if (e && this.props.currentUser) {
             console.log(e.currentTarget.id);
             this.props.setCurrentCourse(e.currentTarget.id, () => {
                 console.log(JSON.stringify(this.props.history));
