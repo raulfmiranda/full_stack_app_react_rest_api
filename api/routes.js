@@ -41,10 +41,9 @@ router.post("/users201", mid.emailValidation, function(req, res, next) {
             if(err) return next(err);
 
             req.session.currentUserId = user._id;
-
-            res.location('/');
-            res.status(301);
-            res.json({});
+            // res.location('/');
+            // res.status(301);
+            res.json(user);
         });
     } else {
         var err = new Error('All fields required.');
@@ -103,7 +102,7 @@ router.post("/courses201", mid.requiresLogin, function(req, res, next) {
 
 // PUT /api/courses/:id204
 // Updates a course and returns no content
-router.put("/courses/:id204", mid.checkCredentials, mid.userCourseOwner, function(req, res, next) {
+router.put("/courses/:id204", mid.requiresLogin, mid.userCourseOwner, function(req, res, next) {
 
     if (req.body.title && req.body.description) { 
         req.course.update(req.body, function(err, result){

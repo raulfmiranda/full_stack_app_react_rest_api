@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 class UserSignUp extends Component {
 
@@ -26,6 +26,13 @@ class UserSignUp extends Component {
                 ...this.state.user,
                 [name]: value
             }
+        });
+    }
+
+    submitHandler = () => {
+        this.props.registerUser(this.state.user, () => {
+            console.log(JSON.stringify(this.props.history));
+            this.props.history.push('/');
         });
     }
 
@@ -96,7 +103,7 @@ class UserSignUp extends Component {
                                 <button 
                                     className="button" 
                                     type="button" 
-                                    onClick={() => this.props.registerUser(this.state.user)}>
+                                    onClick={this.submitHandler}>
                                     Sign Up
                                 </button>
                                 <Link to="/" className="button button-secondary">Cancel</Link>
@@ -104,7 +111,7 @@ class UserSignUp extends Component {
                         </form>
                     </div>
                     <p>&nbsp;</p>
-                    <p>Already have a user account? <a href="sign-in.html">Click here</a> to sign in!</p>
+                    <p>Already have a user account? <Link to="/signin">Click here</Link> to sign in!</p>
                 </div>
             </div>
         );
@@ -112,4 +119,4 @@ class UserSignUp extends Component {
     
 }
 
-export default UserSignUp;
+export default withRouter(UserSignUp);

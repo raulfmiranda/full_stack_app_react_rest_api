@@ -10,6 +10,8 @@ class Courses extends Component {
                 console.log(JSON.stringify(this.props.history));
                 this.props.history.push('/detail');
             });
+        } else {
+            alert("You must be logged in!");
         }
     }
 
@@ -35,11 +37,6 @@ class Courses extends Component {
                             <h4 className="course--label">Course</h4>
                             <h3 className="course--title">{course.title}</h3>
                         </div>
-                        {/* <Link to="/detail" className="course--module course--link">
-                            <h4 className="course--label">Course</h4>
-                            <h3 className="course--title">{course.title}</h3>
-                            <input type="hidden" name="courseId" value={course._id}/>
-                        </Link> */}
                     </div>
                 ))}
     

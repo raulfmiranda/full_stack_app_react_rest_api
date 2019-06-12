@@ -44,8 +44,8 @@ class UpdateCourse extends Component {
         } else {
             this.setState({emptyValues: []});
             this.props.updateCourse(this.state.course, () => {
-                // console.log(JSON.stringify(this.props.history));
-                // this.props.history.push('/');
+                console.log(JSON.stringify(this.props.history));
+                this.props.history.push('/detail');
             });
         }
     }

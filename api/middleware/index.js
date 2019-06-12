@@ -58,7 +58,7 @@ function emailValidation(req, res, next) {
 function userCourseOwner(req, res, next) {
 
     let currentUserId = JSON.stringify(req.session.currentUserId);
-    let courseUser = JSON.stringify(req.session.currentUserId);
+    let courseUser = JSON.stringify(req.course.currentUserId);
 
     if (currentUserId == courseUser) {
         return next();

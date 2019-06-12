@@ -21,10 +21,6 @@ class App extends Component {
             loading: false,
             currentUser: null,
             currentCourse: null
-            // currentUser: {
-            //     emailAddress: "jm@email.com",
-            //     password: "1"
-            // }
         };
         this.baseUrl = {
             API: "http://localhost:5000/api",
@@ -76,11 +72,7 @@ class App extends Component {
             this.setState({
                 loading: false,
                 currentUser
-            });
-            
-            callback();
-            // this.props.history.push("/");
-            // window.location.href = this.baseUrl.React + "/";
+            }, () => { callback() });
         })
         .catch(error => {
             if (error && error.response && error.response.data) {
@@ -94,11 +86,11 @@ class App extends Component {
         });
     }
 
-    registerUser = (user) => {
+    registerUser = (user, callback) => {
         this.setState({ loading: true });
 
         if (user.confirmPassword !== user.password) {
-            console.log("Password must be equals to confirm password!");
+            alert("Password must be equals to confirm password!");
             this.setState({ loading: false });
         } else {
             axios({
@@ -111,17 +103,31 @@ class App extends Component {
                     password: user.password
                 },
             }).then(response => {
-                console.log(response.data);
+
+                const currentUser = {
+                    _id: response.data._id,
+                    emailAddress: response.data.emailAddress,
+                    firstName: response.data.firstName,
+                    lastName: response.data.lastName,
+                    password: user.password
+                };
     
                 this.setState({
-                    loading: false
-                });
+                    loading: false,
+                    currentUser
+                }, () => { callback() });
+
             })
-                .catch(error => {
+            .catch(error => {
+                if (error && error.response && error.response.data) {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                    this.setState({ loading: false });
-                    // window.location.href = this.baseUrl.React + "/error";
-                });
+                    alert(error.response.data.message);
+                } else {
+                    console.log('ERROR: ' + JSON.stringify(error));
+                }
+                this.setState({ loading: false });
+                // window.location.href = this.baseUrl.React + "/error";
+            });
         }
     }
 
@@ -167,7 +173,7 @@ class App extends Component {
         }
     }
 
-    updateCourse = (course) => {
+    updateCourse = (course, callback) => {
         this.setState({ loading: true });
 
         if (this.state.currentUser) {
@@ -187,9 +193,21 @@ class App extends Component {
             }).then(response => {
                 console.log(response.data);
     
+                let coursesAfterUpdate = this.state.courses;
+                for (let i = 0; i < coursesAfterUpdate.length; i++) {
+                    if (course._id === coursesAfterUpdate[i]._id) {
+                        coursesAfterUpdate[i] = course;
+                        break;
+                    }
+                }
+
                 this.setState({
-                    loading: false
-                });
+                    loading: false,
+                    courses: coursesAfterUpdate,
+                    currentCourse: course
+                }, () => { callback() });
+
+                callback();
             })
             .catch(error => {
                 if (error && error.response && error.response.data) {
@@ -198,11 +216,9 @@ class App extends Component {
                     console.log('ERROR: ' + JSON.stringify(error));
                 }
                 this.setState({ loading: false });
-                // window.location.href = this.baseUrl.React + "/error";
             });
         } else {
             this.setState({ loading: false });
-            // window.location.href = this.baseUrl.React + "/forbidden";
         }
     }
 
@@ -281,17 +297,19 @@ class App extends Component {
                 <Router>
                     <Header currentUser={this.state.currentUser} signOut={this.signOut}/>
                     <hr />
-                    <Switch>
-                        <Route exact path="/" component={ () => <Courses courses={this.state.courses} currentUser={this.state.currentUser} setCurrentCourse={this.setCurrentCourse}/> } />
-                        <Route path="/signin" component={ () => <UserSignIn requestLogin={this.requestLogin} /> } />
-                        <Route path="/signup" component={ () => <UserSignUp registerUser={this.registerUser}/> } />
-                        <Route path="/create" component={ () => <CreateCourse createCourse={this.createCourse}/>} />
-                        <Route path="/update" component={ () => updateCourse } />
-                        <Route path="/detail" component={ () => courseDetail } />
-                        <Route path="/error" component={ () => <Message message={erroMsg}/> } />
-                        <Route path="/forbidden" component={ () => <Message message={forbiddenMsg}/> } />
-                        <Route path="*" component={ () => <Message message={notFoundMsg}/> } />
-                    </Switch>
+                    { (this.state.loading) ? <h3>Loading...</h3> : 
+                        <Switch>
+                            <Route exact path="/" component={ () => <Courses courses={this.state.courses} currentUser={this.state.currentUser} setCurrentCourse={this.setCurrentCourse}/> } />
+                            <Route path="/signin" component={ () => <UserSignIn requestLogin={this.requestLogin} /> } />
+                            <Route path="/signup" component={ () => <UserSignUp registerUser={this.registerUser}/> } />
+                            <Route path="/create" component={ () => <CreateCourse createCourse={this.createCourse}/>} />
+                            <Route path="/update" component={ () => updateCourse } />
+                            <Route path="/detail" component={ () => courseDetail } />
+                            <Route path="/error" component={ () => <Message message={erroMsg}/> } />
+                            <Route path="/forbidden" component={ () => <Message message={forbiddenMsg}/> } />
+                            <Route path="*" component={ () => <Message message={notFoundMsg}/> } />
+                        </Switch>
+                    }
                 </Router>
             </div>
         );
