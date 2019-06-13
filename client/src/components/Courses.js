@@ -1,7 +1,53 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from "react-router-dom";
+import axios from 'axios';
 
 class Courses extends Component {
+
+    constructor() {
+        super();
+        this.state = {
+            courses: [],
+            loading: false
+        }
+        this.baseUrl = {
+            API: "http://localhost:5000/api",
+            React: "http://localhost:3000"
+        };
+        this.axiosCancelTokenSource = axios.CancelToken.source();
+        this._isMounted = false;
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+        this.requestCourses();
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+        this.axiosCancelTokenSource.cancel('Axios canceled.');
+    }
+
+    requestCourses = () => {
+        this._isMounted && this.setState({ loading: true });
+
+        axios.get(this.baseUrl.API + "/courses200", {
+            cancelToken: this.axiosCancelTokenSource.token
+        }).then(response => {
+            this.setState({
+                courses: response.data,
+                loading: false
+            });
+        })
+        .catch(error => {
+            if (axios.isCancel(error)) {
+                console.log('Request canceled', error.message);
+            } else {
+                console.log('Error fetching and parsing data', error);
+            }
+            this._isMounted && this.setState({ loading: false });
+        });
+    }
 
     clickDetailHandler = e => {
         if (e && this.props.currentUser) {
@@ -31,13 +77,15 @@ class Courses extends Component {
 
         return (
             <div className="bounds">
-                {this.props.courses.map((course, index) => (
-                    <div key={index} id={course._id} onClick={this.clickDetailHandler} className="grid-33">
+                {this.state.courses.map((course, index) => (
+                    <Link key={index} to={`/courses/${course._id}`} className="grid-33">
+                    {/* <div key={index} id={course._id} onClick={this.clickDetailHandler} className="grid-33"> */}
                         <div className="course--module course--link">
                             <h4 className="course--label">Course</h4>
                             <h3 className="course--title">{course.title}</h3>
                         </div>
-                    </div>
+                    {/* </div> */}
+                    </Link>
                 ))}
     
                 { newCourse }

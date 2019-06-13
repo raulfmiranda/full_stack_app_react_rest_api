@@ -13,12 +13,12 @@ class UserSignIn extends Component {
     }
 
     handleSubmit = () => {
-        this.props.requestLogin(
+        this.props.signIn(
             this.emailInput.current.value, 
             this.passwordInput.current.value,
             () => {
                 console.log(JSON.stringify(this.props.history));
-                this.props.history.push('/');
+                this.props.history.goBack();
             }
         );
     }

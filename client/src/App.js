@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from 'axios';
+import Cookies from 'universal-cookie';
 import './styles/global.css';
 
 import Header from './components/Header';
@@ -17,7 +18,6 @@ class App extends Component {
     constructor() {
         super();
         this.state = {
-            courses: [],
             loading: false,
             currentUser: null,
             currentCourse: null
@@ -28,25 +28,23 @@ class App extends Component {
         };
     }
 
-    requestCourses = () => {
-        console.log("REQUEST COURSES");
-        this.setState({ loading: true });
+    componentDidMount() {
+        const cookies = new Cookies();
 
-        axios.get(this.baseUrl.API + "/courses200")
-            .then(response => {
-                this.setState({
-                    courses: response.data,
-                    loading: false
-                }, () => { });
-            })
-            .catch(error => {
-                console.log('Error fetching and parsing data', error);
-                this.setState({ loading: false });
-                // window.location.href = this.baseUrl.React + "/error";
+        if (!this.state.currentUser && cookies.get('currentUserEmail')) {
+            this.setState({
+                currentUser: {
+                    _id: cookies.get('currentUserId'),
+                    emailAddress: cookies.get('currentUserEmail'),
+                    firstName: cookies.get('currentUserFirstName'),
+                    lastName: cookies.get('currentUserLastName'),
+                    password: cookies.get('currentUserPassword')
+                }
             });
+        }
     }
 
-    requestLogin = (email, password, callback) => {
+    signIn = (email, password, callback) => {
 
         this.setState({ loading: true });
 
@@ -72,7 +70,15 @@ class App extends Component {
             this.setState({
                 loading: false,
                 currentUser
-            }, () => { callback() });
+            }, () => { 
+                const cookies = new Cookies();
+                cookies.set('currentUserId', response.data[0]._id, { path: '/' });
+                cookies.set('currentUserEmail', response.data[0].emailAddress, { path: '/' });
+                cookies.set('currentUserFirstName', response.data[0].firstName, { path: '/' });
+                cookies.set('currentUserLastName', response.data[0].lastName, { path: '/' });
+                cookies.set('currentUserPassword', password, { path: '/' });
+                callback(); 
+            });
         })
         .catch(error => {
             if (error && error.response && error.response.data) {
@@ -173,95 +179,6 @@ class App extends Component {
         }
     }
 
-    updateCourse = (course, callback) => {
-        this.setState({ loading: true });
-
-        if (this.state.currentUser) {
-            axios({
-                method: 'put',
-                url: this.baseUrl.API + `/courses/${course._id}`,
-                data: {
-                    title: course.title,
-                    description: course.description,
-                    estimatedTime: course.estimatedTime,
-                    materialsNeeded: course.materialsNeeded
-                },
-                withCredentials: true
-            }).then(response => {
-                console.log(response.data);
-    
-                let coursesAfterUpdate = this.state.courses;
-                for (let i = 0; i < coursesAfterUpdate.length; i++) {
-                    if (course._id === coursesAfterUpdate[i]._id) {
-                        coursesAfterUpdate[i] = course;
-                        break;
-                    }
-                }
-
-                this.setState({
-                    loading: false,
-                    courses: coursesAfterUpdate,
-                    currentCourse: course
-                }, () => { callback() });
-
-                callback();
-            })
-            .catch(error => {
-                console.log('ERROR: ' + JSON.stringify(error));
-
-                if (error && error.response && error.response.data) {
-                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                    alert(error.response.data.message);
-                }
-                this.setState({ loading: false });
-            });
-        } else {
-            this.setState({ loading: false });
-        }
-    }
-
-    deleteCourse = (callback) => {
-
-        this.setState({ loading: true });
-
-        if (this.state.currentUser) {
-            axios({
-                method: 'delete',
-                url: this.baseUrl.API + `/courses/${this.state.currentCourse._id}`,
-                withCredentials: true
-            }).then(response => {
-                console.log(response.data);
-
-                let coursesAfterDelete = this.state.courses;
-                for (let i = 0; i < this.state.courses.length; i++) {
-                    if (this.state.currentCourse._id === this.state.courses[i]._id) {
-                        coursesAfterDelete.splice(i, 1);
-                        break;
-                    }
-                }
-
-                this.setState({
-                    loading: false,
-                    courses: coursesAfterDelete,
-                }, () => { callback() });
-            
-            })
-            .catch(error => {
-                console.log('ERROR1: ' + JSON.stringify(error));
-                if (error && error.response && error.response.data) {
-                    console.log('ERROR2: ' + JSON.stringify(error.response.data.message));
-                    alert(error.response.data.message);
-                } 
-
-                this.setState({ loading: false });
-                // window.location.href = this.baseUrl.React + "/error";
-            });
-        }  else {
-            this.setState({ loading: false });
-            // window.location.href = this.baseUrl.React + "/forbidden";
-        }
-    }
-
     setCurrentCourse = (courseId, callback) => {
         let course = {};
         for (let i = 0; i < this.state.courses.length; i++) {
@@ -275,18 +192,18 @@ class App extends Component {
     }
 
     signOut = () => {
-        this.setState({ currentUser: null });
-    }
+        const cookies = new Cookies();
+        cookies.remove('currentUserId', { path: '/' });
+        cookies.remove('currentUserEmail', { path: '/' });
+        cookies.remove('currentUserFirstName', { path: '/' });
+        cookies.remove('currentUserLastName', { path: '/' });
+        cookies.remove('currentUserPassword', { path: '/' });
 
-    componentDidMount() {
-        this.requestCourses();
+        this.setState({ currentUser: null });
     }
 
     render() {
 
-        const courseDetail = this.state.currentCourse && <CourseDetail course={this.state.currentCourse} deleteCourse={this.deleteCourse}/>;
-        const updateCourse = this.state.currentCourse && <UpdateCourse course={this.state.currentCourse} updateCourse={this.updateCourse}/>;
-        
         const erroMsg = { title: "Error", body: "Sorry! We just encountered an unexpected error." };
         const forbiddenMsg = { title: "Forbidden", body: "Oh oh! You can't access this page." };
         const notFoundMsg = { title: "Not Found", body: "Sorry! We couldn't find the page you're looking for." };
@@ -298,14 +215,15 @@ class App extends Component {
                     <hr />
                     { (this.state.loading) ? <h3>Loading...</h3> : 
                         <Switch>
-                            <Route exact path="/" component={ () => <Courses courses={this.state.courses} currentUser={this.state.currentUser} setCurrentCourse={this.setCurrentCourse}/> } />
-                            <Route path="/signin" component={ () => <UserSignIn requestLogin={this.requestLogin} /> } />
+                            <Route exact path="/" component={ () => <Courses currentUser={this.state.currentUser} setCurrentCourse={this.setCurrentCourse}/> } />
+                            <Route path="/signin" component={ () => <UserSignIn signIn={this.signIn} /> } />
                             <Route path="/signup" component={ () => <UserSignUp registerUser={this.registerUser}/> } />
                             <Route path="/create" component={ () => <CreateCourse createCourse={this.createCourse}/>} />
-                            <Route path="/update" component={ () => updateCourse } />
-                            <Route path="/detail" component={ () => courseDetail } />
+                            <Route path="/courses/:id/update" component={ () => <UpdateCourse currentUser={this.state.currentUser}/> } />
+                            <Route path="/courses/:id" component={ () => <CourseDetail deleteCourse={this.deleteCourse} currentUser={this.state.currentUser}/> } />
                             <Route path="/error" component={ () => <Message message={erroMsg}/> } />
                             <Route path="/forbidden" component={ () => <Message message={forbiddenMsg}/> } />
+                            <Route path="/notfound" component={ () => <Message message={notFoundMsg}/> } />
                             <Route path="*" component={ () => <Message message={notFoundMsg}/> } />
                         </Switch>
                     }

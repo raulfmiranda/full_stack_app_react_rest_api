@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from "react-router-dom";
+import axios from 'axios';
 import Validation from './Validation';
 
 class UpdateCourse extends Component {
@@ -17,8 +18,21 @@ class UpdateCourse extends Component {
                 estimatedTime: '',
                 materialsNeeded: ''
             },
-            emptyValues: []
+            emptyValues: [],
+            loading: false
         }
+        this.baseUrl = {
+            API: "http://localhost:5000/api",
+            React: "http://localhost:3000"
+        };
+    }
+
+    componentDidMount() {
+        const { id } = this.props.match.params
+        console.log("ID: " + id);
+        this.setState({currentUser: this.props.currentUser}, () => {
+            this.requestCourse(id);
+        });
     }
 
     changeHandler = e => {
@@ -42,16 +56,67 @@ class UpdateCourse extends Component {
             else
                 this.setState({emptyValues: ["Description"]});
         } else {
-            this.setState({emptyValues: []});
-            this.props.updateCourse(this.state.course, () => {
-                console.log(JSON.stringify(this.props.history));
-                this.props.history.push('/detail');
+            this.setState({emptyValues: []}, () => {
+                this.updateCourse(() => {
+                    console.log(JSON.stringify(this.props.history));
+                    this.props.history.push(`/courses/${this.state.course._id}`);
+                });
             });
         }
     }
 
-    componentDidMount() {
-        this.setState({ course: this.props.course });
+    requestCourse = (courseId) => {
+        this.setState({ loading: true });
+
+        axios.get(this.baseUrl.API + `/courses/${courseId}`)
+            .then(response => {
+                this.setState({
+                    course: response.data,
+                    loading: false
+                }, () => {
+                    if (response.data.user._id !== this.props.currentUser._id) {
+                        this.props.history.push('/forbidden');
+                    }
+                });
+            })
+            .catch(error => {
+                console.log('Error fetching and parsing data', error);
+                this.setState({ loading: false });
+                this.props.history.push('/notfound');
+            });
+    }
+
+    updateCourse = (callback) => {
+        this.setState({ loading: true });
+
+        if (this.props.currentUser) {
+            axios({
+                method: 'put',
+                url: this.baseUrl.API + `/courses/${this.state.course._id}`,
+                data: {
+                    title: this.state.course.title,
+                    description: this.state.course.description,
+                    estimatedTime: this.state.course.estimatedTime,
+                    materialsNeeded: this.state.course.materialsNeeded
+                },
+                withCredentials: true
+            }).then(response => {
+                
+                console.log(response.data);
+                callback();
+
+            }).catch(error => {
+                console.log('ERROR: ' + error);
+
+                if (error && error.response && error.response.data) {
+                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
+                    this.props.history.push('/forbidden');
+                }
+                this.setState({ loading: false });
+            });
+        } else {
+            this.setState({ loading: false });
+        }
     }
 
     render () {
