@@ -180,16 +180,13 @@ class App extends Component {
             axios({
                 method: 'put',
                 url: this.baseUrl.API + `/courses/${course._id}`,
-                auth: {
-                    username: this.state.currentUser.emailAddress,
-                    password: this.state.currentUser.password
-                },
                 data: {
                     title: course.title,
                     description: course.description,
                     estimatedTime: course.estimatedTime,
                     materialsNeeded: course.materialsNeeded
-                }
+                },
+                withCredentials: true
             }).then(response => {
                 console.log(response.data);
     
@@ -210,10 +207,11 @@ class App extends Component {
                 callback();
             })
             .catch(error => {
+                console.log('ERROR: ' + JSON.stringify(error));
+
                 if (error && error.response && error.response.data) {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                } else {
-                    console.log('ERROR: ' + JSON.stringify(error));
+                    alert(error.response.data.message);
                 }
                 this.setState({ loading: false });
             });
@@ -249,9 +247,10 @@ class App extends Component {
             
             })
             .catch(error => {
-                console.log('ERROR: ' + JSON.stringify(error));
+                console.log('ERROR1: ' + JSON.stringify(error));
                 if (error && error.response && error.response.data) {
-                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
+                    console.log('ERROR2: ' + JSON.stringify(error.response.data.message));
+                    alert(error.response.data.message);
                 } 
 
                 this.setState({ loading: false });
