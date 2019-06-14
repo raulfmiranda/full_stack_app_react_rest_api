@@ -83,16 +83,29 @@ class CourseDetail extends Component {
         }     
     }
 
+    currentUserIsCourseOwner = () => {
+        if (!this.props.currentUser || !this.state.course.user._id) {
+            return false;
+        }
+        if (this.props.currentUser._id === this.state.course.user._id) {
+            return true;
+        }
+        return false;
+    }
+
     render() {
         return (
             <div>
                 <div className="actions--bar">
                     <div className="bounds">
                         <div className="grid-100">
-                            <span>
-                                <Link to={`/courses/${this.state.course._id}/update`} className="button">Update Course</Link>
-                                <button className="button" type="button" onClick={this.deleteCourse}>Delete Course</button>
-                            </span>
+                            {   this.props.currentUser && 
+                                this.currentUserIsCourseOwner() &&
+                                <span>
+                                    <Link to={`/courses/${this.state.course._id}/update`} className="button">Update Course</Link>
+                                    <button className="button" type="button" onClick={this.deleteCourse}>Delete Course</button>
+                                </span>
+                            }
                                 <Link to="/" className="button button-secondary">Return to List</Link>
                         </div>
                     </div>
