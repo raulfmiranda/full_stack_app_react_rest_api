@@ -108,7 +108,7 @@ class UpdateCourse extends Component {
 
                 if (error && error.response && error.response.data) {
                     console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                    this.props.history.push('/forbidden');
+                    alert(error.response.data.message);
                 }
                 this.setState({ loading: false });
             });

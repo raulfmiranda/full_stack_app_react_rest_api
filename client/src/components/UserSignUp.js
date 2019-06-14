@@ -31,7 +31,6 @@ class UserSignUp extends Component {
 
     submitHandler = () => {
         this.props.registerUser(this.state.user, () => {
-            console.log(JSON.stringify(this.props.history));
             this.props.history.push('/');
         });
     }

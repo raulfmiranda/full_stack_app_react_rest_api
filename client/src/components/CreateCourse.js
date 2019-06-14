@@ -39,10 +39,10 @@ class CreateCourse extends Component {
             else
                 this.setState({emptyValues: ["Description"]});
         } else {
-            this.setState({emptyValues: []});
-            this.props.createCourse(this.state.course, () => {
-                console.log(JSON.stringify(this.props.history));
-                this.props.history.push('/');
+            this.setState({emptyValues: []}, () => {
+                this.props.createCourse(this.state.course, (courseId) => {
+                    this.props.history.push(`/courses/${courseId}`);
+                });
             });
         }
     }
@@ -68,7 +68,6 @@ class CreateCourse extends Component {
                                         defaultValue="My course" 
                                     />
                                 </div>
-                                <p>By Joe Smith</p>
                             </div>
                             <div className="course--description">
                                 <div>

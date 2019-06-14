@@ -43,6 +43,38 @@ class App extends Component {
         }
     }
 
+    createCourse = (course, callback) => {
+        this.setState({ loading: true });
+
+        if (this.state.currentUser) {
+            axios({
+                method: 'post',
+                url: this.baseUrl.API + "/courses201",
+                data: {
+                    title: course.title,
+                    description: course.description,
+                    estimatedTime: course.estimatedTime,
+                    materialsNeeded: course.materialsNeeded
+                },
+                withCredentials: true
+            }).then(response => {
+                this.setState({ loading: false }, () => {
+                    callback(response.data._id);
+                });                
+            }).catch(error => {
+                if (error && error.response && error.response.data) {
+                    console.log('2 ERROR: ' + JSON.stringify(error.response.data.message));
+                    alert(error.response.data.message);
+                } else {
+                    console.log('3 ERROR: ' + JSON.stringify(error));
+                }
+                this.setState({ loading: false });
+            });
+        } else {
+            console.log("Create Course Forbidden!");
+        }
+    }
+
     signIn = (email, password, callback) => {
 
         this.setState({ loading: true });
@@ -136,48 +168,6 @@ class App extends Component {
         }
     }
 
-    createCourse = (course, callback) => {
-        this.setState({ loading: true });
-
-        if (this.state.currentUser) {
-            axios({
-                method: 'post',
-                url: this.baseUrl.API + "/courses201",
-                data: {
-                    title: course.title,
-                    description: course.description,
-                    estimatedTime: course.estimatedTime,
-                    materialsNeeded: course.materialsNeeded
-                },
-                withCredentials: true
-            }).then(response => {
-    
-                this.setState({
-                    loading: false
-                });
-
-                let coursesTemp = this.state.courses;
-                coursesTemp.push(response.data);
-                this.setState({ courses: coursesTemp });
-
-                callback();
-                // window.location.href = this.baseUrl.React + "/";
-            })
-            .catch(error => {
-                if (error && error.response && error.response.data) {
-                    console.log('ERROR: ' + JSON.stringify(error.response.data.message));
-                } else {
-                    console.log('ERROR: ' + JSON.stringify(error));
-                }
-                this.setState({ loading: false });
-                // window.location.href = this.baseUrl.React + "/error";
-            });
-        } else {
-            console.log("Create Course Forbidden!");
-            // window.location.href = this.baseUrl.React + "/forbidden";
-        }
-    }
-
     setCurrentCourse = (courseId, callback) => {
         let course = {};
         for (let i = 0; i < this.state.courses.length; i++) {
@@ -218,7 +208,7 @@ class App extends Component {
                     <hr />
                     { (this.state.loading) ? <h3>Loading...</h3> : 
                         <Switch>
-                            <Route exact path="/" component={ () => <Courses /> } />
+                            <Route exact path="/" component={ () => <Courses currentUser={this.state.currentUser}/> } />
                             <Route path="/signin" component={ () => <UserSignIn signIn={this.signIn} /> } />
                             <Route path="/signup" component={ () => <UserSignUp registerUser={this.registerUser}/> } />
                             <Route path="/courses/create" component={ () => <CreateCourse createCourse={this.createCourse} isAuthenticated={this.isAuthenticated()}/>} />
