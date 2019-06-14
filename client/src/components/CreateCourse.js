@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Validation from './Validation';
 import { Link, withRouter } from "react-router-dom";
+import { requireAuthentication } from "./PrivateRoute";
 
 class CreateCourse extends Component {
 
@@ -125,4 +126,5 @@ class CreateCourse extends Component {
 
 }
 
-export default withRouter(CreateCourse);
+
+export default withRouter(requireAuthentication(CreateCourse));

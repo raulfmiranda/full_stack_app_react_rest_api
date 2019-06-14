@@ -19,8 +19,7 @@ class App extends Component {
         super();
         this.state = {
             loading: false,
-            currentUser: null,
-            currentCourse: null
+            currentUser: null
         };
         this.baseUrl = {
             API: "http://localhost:5000/api",
@@ -202,6 +201,10 @@ class App extends Component {
         this.setState({ currentUser: null });
     }
 
+    isAuthenticated = () => {
+        return this.state.currentUser ? true : false;
+    }
+
     render() {
 
         const erroMsg = { title: "Error", body: "Sorry! We just encountered an unexpected error." };
@@ -215,12 +218,12 @@ class App extends Component {
                     <hr />
                     { (this.state.loading) ? <h3>Loading...</h3> : 
                         <Switch>
-                            <Route exact path="/" component={ () => <Courses currentUser={this.state.currentUser} setCurrentCourse={this.setCurrentCourse}/> } />
+                            <Route exact path="/" component={ () => <Courses /> } />
                             <Route path="/signin" component={ () => <UserSignIn signIn={this.signIn} /> } />
                             <Route path="/signup" component={ () => <UserSignUp registerUser={this.registerUser}/> } />
-                            <Route path="/create" component={ () => <CreateCourse createCourse={this.createCourse}/>} />
-                            <Route path="/courses/:id/update" component={ () => <UpdateCourse currentUser={this.state.currentUser}/> } />
-                            <Route path="/courses/:id" component={ () => <CourseDetail deleteCourse={this.deleteCourse} currentUser={this.state.currentUser}/> } />
+                            <Route path="/courses/create" component={ () => <CreateCourse createCourse={this.createCourse} isAuthenticated={this.isAuthenticated()}/>} />
+                            <Route path="/courses/:id/update" component={ () => <UpdateCourse currentUser={this.state.currentUser} isAuthenticated={this.isAuthenticated()}/> } />
+                            <Route path="/courses/:id" component={ () => <CourseDetail deleteCourse={this.deleteCourse} currentUser={this.state.currentUser} /> } />
                             <Route path="/error" component={ () => <Message message={erroMsg}/> } />
                             <Route path="/forbidden" component={ () => <Message message={forbiddenMsg}/> } />
                             <Route path="/notfound" component={ () => <Message message={notFoundMsg}/> } />

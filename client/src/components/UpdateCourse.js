@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link, withRouter } from "react-router-dom";
 import axios from 'axios';
 import Validation from './Validation';
+import { requireAuthentication } from "./PrivateRoute";
 
 class UpdateCourse extends Component {
 
@@ -29,10 +30,7 @@ class UpdateCourse extends Component {
 
     componentDidMount() {
         const { id } = this.props.match.params
-        console.log("ID: " + id);
-        this.setState({currentUser: this.props.currentUser}, () => {
-            this.requestCourse(id);
-        });
+        this.requestCourse(id);
     }
 
     changeHandler = e => {
@@ -196,4 +194,4 @@ class UpdateCourse extends Component {
     }
 }
 
-export default withRouter(UpdateCourse);
+export default withRouter(requireAuthentication(UpdateCourse));

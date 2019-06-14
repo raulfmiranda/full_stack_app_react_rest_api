@@ -55,7 +55,7 @@ class CourseDetail extends Component {
         });
     }
 
-    deleteCourse = (callback) => {
+    deleteCourse = () => {
 
         this.setState({ loading: true });
 
@@ -66,28 +66,21 @@ class CourseDetail extends Component {
                 withCredentials: true
             }).then(response => {
                 console.log(response.data);
-                callback();
+                this.props.history.push('/');
             })
             .catch(error => {
-                console.log('ERROR1: ' + JSON.stringify(error));
-                if (error && error.response && error.response.data) {
-                    console.log('ERROR2: ' + JSON.stringify(error.response.data.message));
-                    alert(error.response.data.message);
-                } 
-
-                this.setState({ loading: false });
-                // window.location.href = this.baseUrl.React + "/error";
+                this.setState({ loading: false }, () => {
+                    if (error && error.response && error.response.data) {
+                        alert(error.response.data.message);
+                    } else {
+                        this.props.history.push('/error');
+                    }
+                });
             });
-        }  else {
+        } else {
             this.setState({ loading: false });
-            // window.location.href = this.baseUrl.React + "/forbidden";
-        }
-    }
-
-    deleteHandler = () => {
-        this.deleteCourse(() => {
-            this.props.history.push('/');
-        });
+            this.props.history.push('/forbidden');
+        }     
     }
 
     render() {
@@ -98,7 +91,7 @@ class CourseDetail extends Component {
                         <div className="grid-100">
                             <span>
                                 <Link to={`/courses/${this.state.course._id}/update`} className="button">Update Course</Link>
-                                <button className="button" type="button" onClick={this.deleteHandler}>Delete Course</button>
+                                <button className="button" type="button" onClick={this.deleteCourse}>Delete Course</button>
                             </span>
                                 <Link to="/" className="button button-secondary">Return to List</Link>
                         </div>
